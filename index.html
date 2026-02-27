@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Handwriting digit recognition powered by a real MNIST neural network"/>
+  <title>DIGIT·AI — Handwriting Recognition</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/reset.css"/>
+  <link rel="stylesheet" href="css/tokens.css"/>
+  <link rel="stylesheet" href="css/layout.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+
+  <!-- TensorFlow.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js" defer></script>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       TOP BAR
+  ══════════════════════════════════════ -->
+  <header class="topbar" role="banner">
+    <div class="topbar__brand">
+      <span class="brand-name">DIGIT<span class="brand-accent">·</span>AI</span>
+      <span class="brand-tagline">Neural Handwriting Recognition</span>
+    </div>
+
+    <nav class="topbar__actions" aria-label="App controls">
+      <button class="action-btn" id="resetBtn" aria-label="Reset canvas" title="Reset (Escape)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.89"/></svg>
+      </button>
+      <button class="action-btn" id="networkToggle" aria-label="Toggle network panel" aria-expanded="true" title="Toggle Network">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><line x1="12" y1="8" x2="5" y2="16"/><line x1="12" y1="8" x2="19" y2="16"/></svg>
+      </button>
+      <button class="action-btn theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- ══════════════════════════════════════
+       MAIN LAYOUT
+  ══════════════════════════════════════ -->
+  <main class="app-shell" role="main">
+
+    <!-- ── HERO SECTION ─────────────────── -->
+    <section class="hero-section" aria-labelledby="heroTitle">
+      <h1 id="heroTitle" class="hero-title">
+        Draw a digit.<br/>
+        <span class="hero-title--accent">Watch it think.</span>
+      </h1>
+      <p class="hero-sub">Real CNN trained on 60,000 MNIST samples · runs entirely in your browser</p>
+    </section>
+
+    <!-- ── CANVAS + CONTROLS ────────────── -->
+    <section class="canvas-section" aria-label="Drawing area">
+
+      <div class="canvas-container" id="canvasContainer">
+        <!-- Glow ring -->
+        <div class="canvas-ring" id="canvasRing" aria-hidden="true"></div>
+
+        <!-- The actual drawing canvas -->
+        <canvas id="drawCanvas"
+                width="320" height="320"
+                role="img"
+                aria-label="Drawing canvas — draw a digit here"
+                tabindex="0"></canvas>
+
+        <!-- Overlay hint (disappears on first stroke) -->
+        <div class="canvas-overlay" id="canvasOverlay" aria-hidden="true">
+          <span class="canvas-overlay__icon">✏️</span>
+          <span class="canvas-overlay__text">Draw here</span>
+        </div>
+      </div>
+
+      <!-- Brush control -->
+      <div class="brush-row">
+        <label class="brush-label" for="brushSize">
+          <span>PEN</span>
+          <input type="range" id="brushSize" min="8" max="32" value="20"
+                 aria-label="Brush size"/>
+        </label>
+      </div>
+
+      <!-- Primary CTA -->
+      <div class="cta-row">
+        <button class="btn-predict" id="predictBtn" disabled>
+          <span class="btn-predict__icon">⚡</span>
+          <span class="btn-predict__label">Predict</span>
+        </button>
+        <button class="btn-secondary" id="clearBtn">Clear</button>
+      </div>
+
+    </section>
+
+    <!-- ── RESULT DISPLAY ───────────────── -->
+    <section class="result-section" aria-live="polite" aria-label="Prediction result">
+
+      <div class="result-card" id="resultCard">
+        <div class="result-card__bar" id="resultBar"></div>
+        <div class="result-card__scan" id="resultScan" aria-hidden="true"></div>
+
+        <div class="result-digit" id="resultDigit" aria-label="Predicted digit">—</div>
+        <div class="result-conf"  id="resultConf">awaiting input</div>
+
+        <!-- All 10 digit bars -->
+        <div class="prob-bars" id="probBars" aria-label="Digit probabilities">
+          <!-- Built by JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── TRAIN PANEL ──────────────────── -->
+    <section class="train-panel glass-card" aria-labelledby="trainTitle">
+      <div class="train-panel__header">
+        <h2 id="trainTitle" class="train-panel__title">Model Training</h2>
+        <div class="train-panel__status" id="trainStatus">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Not trained</span>
+        </div>
+      </div>
+
+      <div class="train-panel__progress">
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span class="progress-pct" id="progressPct">0%</span>
+      </div>
+
+      <div class="train-panel__stats">
+        <span id="epochStat">Epoch 0 / 10</span>
+        <span id="accStat">Acc —</span>
+        <span id="lossStat">Loss —</span>
+      </div>
+
+      <button class="btn-train" id="trainBtn">▶ Train on MNIST</button>
+    </section>
+
+  </main>
+
+  <!-- ══════════════════════════════════════
+       NETWORK PANEL (toggleable side panel)
+  ══════════════════════════════════════ -->
+  <aside class="network-panel" id="networkPanel" aria-label="Neural network visualization">
+    <div class="network-panel__header">
+      <span class="network-panel__title">Network</span>
+      <span class="network-panel__sub">784 → 16 → 16 → 10</span>
+    </div>
+    <canvas id="netCanvas" aria-label="Neural network diagram"></canvas>
+    <div class="network-panel__legend">
+      <span class="legend-item"><span class="legend-dot legend-dot--active"></span>Active</span>
+      <span class="legend-item"><span class="legend-dot legend-dot--pos"></span>Positive weight</span>
+      <span class="legend-item"><span class="legend-dot legend-dot--neg"></span>Negative weight</span>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════
+       SCRIPTS  (order matters)
+  ══════════════════════════════════════ -->
+  <script src="js/core/model.js"></script>
+  <script src="js/core/preprocessor.js"></script>
+  <script src="js/visual/networkRenderer.js"></script>
+  <script src="js/ui/theme.js"></script>
+  <script src="js/ui/canvas.js"></script>
+  <script src="js/ui/resultsUI.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
