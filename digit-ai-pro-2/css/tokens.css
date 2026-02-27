@@ -1,0 +1,130 @@
+/* css/tokens.css
+   ──────────────────────────────────────
+   Design tokens — single source of truth.
+   All colours, spacing, type, shadows.
+   ────────────────────────────────────── */
+
+/* ── Dark Theme (default) ─────────────── */
+:root,
+[data-theme="dark"] {
+
+  /* Background layers */
+  --bg-base:     #05070d;
+  --bg-surface:  #080c15;
+  --bg-elevated: #0c1220;
+  --bg-overlay:  #101828;
+
+  /* Glass surfaces */
+  --glass-bg:      rgba(255, 255, 255, 0.035);
+  --glass-bg-2:    rgba(255, 255, 255, 0.055);
+  --glass-border:  rgba(255, 255, 255, 0.08);
+  --glass-border-2:rgba(255, 255, 255, 0.13);
+  --glass-shine:   rgba(255, 255, 255, 0.07);
+  --glass-blur:    blur(24px) saturate(180%);
+
+  /* Brand / Accents */
+  --accent:       #00f0ff;
+  --accent-dim:   rgba(0, 240, 255, 0.15);
+  --accent-glow:  rgba(0, 240, 255, 0.35);
+  --accent-2:     #a78bfa;
+  --accent-2-dim: rgba(167, 139, 250, 0.15);
+
+  /* Semantic */
+  --col-positive: #00c8ff;   /* positive weights — blue */
+  --col-negative: #ff4d6d;   /* negative weights — red */
+  --col-green:    #4ade80;
+  --col-amber:    #fcd34d;
+  --col-rose:     #fb7185;
+
+  /* Text */
+  --text-1: #f0f4ff;
+  --text-2: #7c8db0;
+  --text-3: #2e3d58;
+  --text-4: #1a2540;
+
+  /* Canvas */
+  --canvas-bg:     #020408;
+  --canvas-stroke: #ffffff;
+
+  /* Shadows */
+  --shadow-sm:  0 2px 8px  rgba(0,0,0,.35);
+  --shadow-md:  0 8px 32px rgba(0,0,0,.45);
+  --shadow-lg:  0 20px 60px rgba(0,0,0,.55);
+
+  /* Borders */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  /* Spacing (8px grid) */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* Typography */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'Outfit', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+
+  /* Transitions */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out:    cubic-bezier(0.0, 0, 0.2, 1);
+  --dur-fast:    150ms;
+  --dur-normal:  250ms;
+  --dur-slow:    450ms;
+}
+
+/* ── Base body styles ─────────────────── */
+/* (padding-right transition for network panel is in layout.css) */
+body {
+  background:   var(--bg-base);
+  color:        var(--text-1);
+  font-family:  var(--font-body);
+  overflow-x:   hidden;
+}
+
+[data-theme="light"] {
+
+  --bg-base:     #f4f6fb;
+  --bg-surface:  #ffffff;
+  --bg-elevated: #eef1f8;
+  --bg-overlay:  #e8ecf5;
+
+  --glass-bg:       rgba(255,255,255,0.7);
+  --glass-bg-2:     rgba(255,255,255,0.85);
+  --glass-border:   rgba(0,0,0,0.07);
+  --glass-border-2: rgba(0,0,0,0.12);
+  --glass-shine:    rgba(255,255,255,0.9);
+  --glass-blur:     blur(24px) saturate(180%);
+
+  --accent:       #0099cc;
+  --accent-dim:   rgba(0,153,204,0.12);
+  --accent-glow:  rgba(0,153,204,0.25);
+  --accent-2:     #7c3aed;
+  --accent-2-dim: rgba(124,58,237,0.12);
+
+  --col-positive: #0088bb;
+  --col-negative: #e0294a;
+  --col-green:    #16a34a;
+  --col-amber:    #d97706;
+  --col-rose:     #e11d48;
+
+  --text-1: #0f1728;
+  --text-2: #4a5a78;
+  --text-3: #9aaac8;
+  --text-4: #c8d4e8;
+
+  --canvas-bg:     #1a1a2e;
+  --canvas-stroke: #ffffff;
+
+  --shadow-sm:  0 2px 8px  rgba(0,0,0,.08);
+  --shadow-md:  0 8px 32px rgba(0,0,0,.12);
+  --shadow-lg:  0 20px 60px rgba(0,0,0,.16);
+}
