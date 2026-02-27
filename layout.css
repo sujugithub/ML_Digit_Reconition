@@ -1,0 +1,197 @@
+/* css/layout.css
+   ─────────────────────────────────────
+   Page structure, grid, topbar, panels.
+   ───────────────────────────────────── */
+
+/* ── Body & Background ──────────────── */
+
+/* orbs only — transitions and padding-right handled above */
+
+/* Ambient background orbs */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity var(--dur-slow);
+}
+
+body::before {
+  width: 700px; height: 700px;
+  top: -200px; left: -150px;
+  background: radial-gradient(circle, rgba(0,240,255,.1) 0%, transparent 70%);
+  animation: orb-a 20s ease-in-out infinite alternate;
+}
+
+body::after {
+  width: 500px; height: 500px;
+  bottom: -100px; right: -100px;
+  background: radial-gradient(circle, rgba(167,139,250,.1) 0%, transparent 70%);
+  animation: orb-b 25s ease-in-out infinite alternate;
+}
+
+[data-theme="light"] body::before { opacity: .4; }
+[data-theme="light"] body::after  { opacity: .3; }
+
+/* ── Top Bar ─────────────────────────── */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 var(--sp-6);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+  transition: background var(--dur-slow) var(--ease-out);
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  letter-spacing: .16em;
+  line-height: 1;
+  color: var(--text-1);
+}
+
+.brand-accent { color: var(--accent); }
+
+.brand-tagline {
+  font-family: var(--font-mono);
+  font-size: .5rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* ── Main Shell ──────────────────────── */
+
+:root { --network-panel-w: 300px; }
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "hero"
+    "canvas"
+    "result"
+    "train";
+  gap: var(--sp-6);
+  max-width: 580px;
+  /* Centre in the available space — body padding handles the panel offset */
+  margin: 0 auto;
+  padding: var(--sp-8) var(--sp-6) var(--sp-12);
+}
+
+/* When panel is open: add right padding to body so the
+   auto-margin still centres content in the REMAINING space */
+body.network-open {
+  padding-right: var(--network-panel-w);
+  transition: padding-right var(--dur-slow) var(--ease-spring);
+}
+
+body {
+  transition:
+    background     var(--dur-slow) var(--ease-out),
+    color          var(--dur-slow) var(--ease-out),
+    padding-right  var(--dur-slow) var(--ease-spring);
+}
+
+/* Grid areas */
+.hero-section  { grid-area: hero;   }
+.canvas-section{ grid-area: canvas; display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
+.result-section{ grid-area: result; }
+.train-panel   { grid-area: train;  }
+
+/* ── Network Side Panel ──────────────── */
+
+.network-panel {
+  position: fixed;
+  top: 56px;
+  right: 0;
+  bottom: 0;
+  width: var(--network-panel-w);
+  z-index: 50;
+
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-5);
+  gap: var(--sp-4);
+
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-left: 1px solid var(--glass-border);
+
+  /* Hidden by default — slides in */
+  transform: translateX(100%);
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+
+.network-panel.is-open {
+  transform: translateX(0);
+}
+
+.network-panel__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.network-panel__title {
+  font-weight: 700;
+  font-size: .88rem;
+  color: var(--text-1);
+}
+
+.network-panel__sub {
+  font-family: var(--font-mono);
+  font-size: .52rem;
+  color: var(--text-3);
+  letter-spacing: .1em;
+}
+
+#netCanvas {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border-radius: var(--radius-sm);
+}
+
+.network-panel__legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* ── Responsive ──────────────────────── */
+@media (max-width: 760px) {
+  :root { --network-panel-w: 260px; }
+  .app-shell { padding: var(--sp-5) var(--sp-4) var(--sp-10); }
+  /* On mobile, panel overlays rather than shifting content */
+  body.network-open .app-shell { transform: none; }
+}
