@@ -1,0 +1,55 @@
+/* css/animations.css
+   ─────────────────────────────────
+   All keyframe animations.
+   ───────────────────────────────── */
+
+@keyframes orb-a {
+  0%   { transform: translate(0, 0)    scale(1); }
+  50%  { transform: translate(40px, 60px)  scale(1.08); }
+  100% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes orb-b {
+  0%   { transform: translate(0, 0)    scale(1); }
+  50%  { transform: translate(-30px, -40px) scale(1.06); }
+  100% { transform: translate(20px, 10px)   scale(0.97); }
+}
+
+@keyframes scan {
+  0%   { top: 0%; }
+  100% { top: 100%; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1;    }
+  50%       { opacity: 0.2; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%       { opacity: .35; transform: scale(0.7); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Page load stagger */
+.hero-section   { animation: fade-up .6s var(--ease-spring) both; }
+.canvas-section { animation: fade-up .6s var(--ease-spring) .1s both; }
+.result-section { animation: fade-up .6s var(--ease-spring) .2s both; }
+.train-panel    { animation: fade-up .6s var(--ease-spring) .3s both; }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
